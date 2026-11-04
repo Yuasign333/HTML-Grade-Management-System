@@ -1,0 +1,1138 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Student Record and Grade Analyzer</title>
+</head>
+
+<body style="margin:0; font-family:'Poppins','Segoe UI',Arial,sans-serif; background-color:#F8FAFC; color:#0F172A; line-height:1.6;">
+
+    <!--Header: title + progress tracker (shows the user where they are: Enter, Calculate, Save)-->
+
+    <div style="background:linear-gradient(135deg,#1E3A8A 0%,#2563EB 100%); color:white; padding:36px 20px 80px 20px;">
+        <div style="max-width:860px; margin:0 auto;">
+
+            <p style="margin:0; font-size:0.78em; letter-spacing:2px; text-transform:uppercase; color:#BFDBFE;">Web Systems and Technologies &middot; Midterm Examination</p>
+            <h1 style="margin:6px 0 4px 0; font-size:2em;">Student Record and Grade Analyzer</h1>
+            <p style="margin:0; color:#DBEAFE;">Enter the grades, get instant results, and keep every record in one text file.</p>
+
+            <div style="margin-top:22px; display:flex; flex-wrap:wrap; gap:10px;">
+                <span id="step1" style="display:inline-block; padding:6px 16px; border-radius:999px; font-size:0.8em; font-weight:600; background-color:rgba(255,255,255,0.15); color:#DBEAFE; transition:all 0.25s;">1. Enter details</span>
+                <span id="step2" style="display:inline-block; padding:6px 16px; border-radius:999px; font-size:0.8em; font-weight:600; background-color:rgba(255,255,255,0.15); color:#DBEAFE; transition:all 0.25s;">2. Calculate</span>
+                <span id="step3" style="display:inline-block; padding:6px 16px; border-radius:999px; font-size:0.8em; font-weight:600; background-color:rgba(255,255,255,0.15); color:#DBEAFE; transition:all 0.25s;">3. Save record</span>
+            </div>
+
+        </div>
+    </div>
+
+    <div style="max-width:860px; margin:-52px auto 40px auto; padding:0 20px;">
+
+        <!--Card 1: Student Information-->
+
+        <div style="background-color:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:24px; margin-bottom:20px; box-shadow:0 10px 25px -12px rgba(15,23,42,0.18);">
+
+            <h3 style="margin:0; color:#1E3A8A;">Student Information</h3>
+            <p style="margin:0 0 16px 0; font-size:0.85em; color:#64748B;">All fields are required.</p>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;">
+
+                <div>
+                    <label for="studentName" style="display:block; font-weight:600; font-size:0.85em; margin-bottom:4px;">Student Name</label>
+                    <input type="text" id="studentName" placeholder="e.g. Juan Dela Cruz"
+                           oninput="markInputChanged(this)" onfocus="inputFocus(this)" onblur="inputBlur(this)" onkeydown="handleEnter(event)"
+                           style="width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid #CBD5E1; border-radius:8px; font-family:inherit; font-size:0.95em; color:#0F172A; background-color:#FFFFFF; outline:none; transition:border-color 0.2s, box-shadow 0.2s;">
+                    <small id="studentNameHelp" data-help="Capital first letter of each name, e.g. Juan Dela Cruz" style="display:block; color:#64748B; font-size:0.75em; margin-top:4px;">Capital first letter of each name, e.g. Juan Dela Cruz</small>
+                </div>
+
+                <div>
+                    <label for="studentId" style="display:block; font-weight:600; font-size:0.85em; margin-bottom:4px;">Student ID</label>
+                    <input type="text" id="studentId" placeholder="e.g. 24-0084C" maxlength="8"
+                           oninput="markInputChanged(this)" onfocus="inputFocus(this)" onblur="inputBlur(this)" onkeydown="handleEnter(event)"
+                           style="width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid #CBD5E1; border-radius:8px; font-family:inherit; font-size:0.95em; color:#0F172A; background-color:#FFFFFF; outline:none; transition:border-color 0.2s, box-shadow 0.2s;">
+                    <small id="studentIdHelp" data-help="Format: year (24) - number (0084) - college letter (C)" style="display:block; color:#64748B; font-size:0.75em; margin-top:4px;">Format: year (24) - number (0084) - college letter (C)</small>
+                </div>
+
+                <div>
+                    <label for="studentSection" style="display:block; font-weight:600; font-size:0.85em; margin-bottom:4px;">Section</label>
+                    <select id="studentSection"
+                            onchange="sectionChanged(this)" onfocus="inputFocus(this)" onblur="inputBlur(this)"
+                            style="width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid #CBD5E1; border-radius:8px; font-family:inherit; font-size:0.95em; color:#0F172A; background-color:#FFFFFF; outline:none; cursor:pointer; transition:border-color 0.2s, box-shadow 0.2s;">
+                    </select>
+                    <small id="studentSectionHelp" data-help="Pick the course and section. The subjects below follow your choice." style="display:block; color:#64748B; font-size:0.75em; margin-top:4px;">Pick the course and section. The subjects below follow your choice.</small>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!--Card 2: Subject Grades + action buttons + results-->
+
+        <div style="background-color:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:24px; margin-bottom:20px; box-shadow:0 10px 25px -12px rgba(15,23,42,0.18);">
+
+            <h3 style="margin:0; color:#1E3A8A;">Subject Grades</h3>
+            <p style="margin:0 0 16px 0; font-size:0.85em; color:#64748B;">Enter a grade from 0 to 100 for each of the 5 subjects.</p>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(125px,1fr)); gap:14px;">
+
+                <div>
+                    <label id="grade1Label" for="grade1" style="display:block; font-weight:600; font-size:0.8em; margin-bottom:4px;">Subject 1</label>
+                    <input type="number" id="grade1" placeholder="0 - 100" min="0" max="100" step="any"
+                           oninput="markInputChanged(this)" onfocus="inputFocus(this)" onblur="inputBlur(this)" onkeydown="handleEnter(event)"
+                           style="width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid #CBD5E1; border-radius:8px; font-family:inherit; font-size:0.95em; color:#0F172A; background-color:#FFFFFF; outline:none; transition:border-color 0.2s, box-shadow 0.2s;">
+                    <small id="grade1Help" data-help="0 - 100" style="display:block; color:#64748B; font-size:0.72em; margin-top:4px;">0 - 100</small>
+                </div>
+
+                <div>
+                    <label id="grade2Label" for="grade2" style="display:block; font-weight:600; font-size:0.8em; margin-bottom:4px;">Subject 2</label>
+                    <input type="number" id="grade2" placeholder="0 - 100" min="0" max="100" step="any"
+                           oninput="markInputChanged(this)" onfocus="inputFocus(this)" onblur="inputBlur(this)" onkeydown="handleEnter(event)"
+                           style="width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid #CBD5E1; border-radius:8px; font-family:inherit; font-size:0.95em; color:#0F172A; background-color:#FFFFFF; outline:none; transition:border-color 0.2s, box-shadow 0.2s;">
+                    <small id="grade2Help" data-help="0 - 100" style="display:block; color:#64748B; font-size:0.72em; margin-top:4px;">0 - 100</small>
+                </div>
+
+                <div>
+                    <label id="grade3Label" for="grade3" style="display:block; font-weight:600; font-size:0.8em; margin-bottom:4px;">Subject 3</label>
+                    <input type="number" id="grade3" placeholder="0 - 100" min="0" max="100" step="any"
+                           oninput="markInputChanged(this)" onfocus="inputFocus(this)" onblur="inputBlur(this)" onkeydown="handleEnter(event)"
+                           style="width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid #CBD5E1; border-radius:8px; font-family:inherit; font-size:0.95em; color:#0F172A; background-color:#FFFFFF; outline:none; transition:border-color 0.2s, box-shadow 0.2s;">
+                    <small id="grade3Help" data-help="0 - 100" style="display:block; color:#64748B; font-size:0.72em; margin-top:4px;">0 - 100</small>
+                </div>
+
+                <div>
+                    <label id="grade4Label" for="grade4" style="display:block; font-weight:600; font-size:0.8em; margin-bottom:4px;">Subject 4</label>
+                    <input type="number" id="grade4" placeholder="0 - 100" min="0" max="100" step="any"
+                           oninput="markInputChanged(this)" onfocus="inputFocus(this)" onblur="inputBlur(this)" onkeydown="handleEnter(event)"
+                           style="width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid #CBD5E1; border-radius:8px; font-family:inherit; font-size:0.95em; color:#0F172A; background-color:#FFFFFF; outline:none; transition:border-color 0.2s, box-shadow 0.2s;">
+                    <small id="grade4Help" data-help="0 - 100" style="display:block; color:#64748B; font-size:0.72em; margin-top:4px;">0 - 100</small>
+                </div>
+
+                <div>
+                    <label id="grade5Label" for="grade5" style="display:block; font-weight:600; font-size:0.8em; margin-bottom:4px;">Subject 5</label>
+                    <input type="number" id="grade5" placeholder="0 - 100" min="0" max="100" step="any"
+                           oninput="markInputChanged(this)" onfocus="inputFocus(this)" onblur="inputBlur(this)" onkeydown="handleEnter(event)"
+                           style="width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid #CBD5E1; border-radius:8px; font-family:inherit; font-size:0.95em; color:#0F172A; background-color:#FFFFFF; outline:none; transition:border-color 0.2s, box-shadow 0.2s;">
+                    <small id="grade5Help" data-help="0 - 100" style="display:block; color:#64748B; font-size:0.72em; margin-top:4px;">0 - 100</small>
+                </div>
+
+            </div>
+
+            <!--Buttons: Calculate (main action), Clear, Save Record (disabled until a successful Calculate)-->
+
+            <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:22px;">
+
+                <input type="button" id="calculateBtn" value="Calculate" onclick="calculateResults()"
+                       onmouseover="buttonHover(this, true)" onmouseout="buttonHover(this, false)"
+                       style="background-color:#2563EB; color:white; padding:12px 28px; font-family:inherit; font-size:0.95em; font-weight:600; border:none; border-radius:10px; cursor:pointer; box-shadow:0 6px 14px -6px rgba(37,99,235,0.7); transition:all 0.2s;">
+
+                <input type="button" id="clearBtn" value="Clear" onclick="clearForm()"
+                       onmouseover="buttonHover(this, true)" onmouseout="buttonHover(this, false)"
+                       style="background-color:#FFFFFF; color:#0F172A; padding:12px 28px; font-family:inherit; font-size:0.95em; font-weight:600; border:1px solid #CBD5E1; border-radius:10px; cursor:pointer; transition:all 0.2s;">
+
+                <input type="button" id="saveBtn" value="Save Record" onclick="saveRecord()" disabled title="Click Calculate first"
+                       onmouseover="buttonHover(this, true)" onmouseout="buttonHover(this, false)"
+                       style="background-color:#E2E8F0; color:#94A3B8; padding:12px 28px; font-family:inherit; font-size:0.95em; font-weight:600; border:none; border-radius:10px; cursor:not-allowed; transition:all 0.2s;">
+
+            </div>
+
+            <!--Status banner: always tells the user what is happening-->
+
+            <div id="statusBox" role="status" aria-live="polite"
+                 style="margin-top:18px; padding:12px 14px; border-radius:10px; font-size:0.88em; background-color:#EFF6FF; border:1px solid #BFDBFE; color:#1E3A8A;"></div>
+
+            <!--Results-->
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-top:18px;">
+
+                <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:14px;">
+                    <div style="font-size:0.7em; color:#64748B; text-transform:uppercase; letter-spacing:0.5px;">Total Grade</div>
+                    <div id="resultTotal" style="font-size:1.6em; font-weight:700; color:#1E3A8A;">&mdash;</div>
+                </div>
+
+                <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:14px;">
+                    <div style="font-size:0.7em; color:#64748B; text-transform:uppercase; letter-spacing:0.5px;">Average Grade</div>
+                    <div id="resultAverage" style="font-size:1.6em; font-weight:700; color:#1E3A8A;">&mdash;</div>
+                </div>
+
+                <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:14px;">
+                    <div style="font-size:0.7em; color:#64748B; text-transform:uppercase; letter-spacing:0.5px;">Highest Grade</div>
+                    <div id="resultHighest" style="font-size:1.6em; font-weight:700; color:#1E3A8A;">&mdash;</div>
+                </div>
+
+                <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:14px;">
+                    <div style="font-size:0.7em; color:#64748B; text-transform:uppercase; letter-spacing:0.5px;">Lowest Grade</div>
+                    <div id="resultLowest" style="font-size:1.6em; font-weight:700; color:#1E3A8A;">&mdash;</div>
+                </div>
+
+                <div style="background-color:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:14px;">
+                    <div style="font-size:0.7em; color:#64748B; text-transform:uppercase; letter-spacing:0.5px;">Remark</div>
+                    <div id="resultRemark" style="font-size:1.15em; font-weight:700; color:#1E3A8A; padding-top:6px;">&mdash;</div>
+                </div>
+
+            </div>
+
+            <!--Grading scale legend (the user does not have to remember the ranges)-->
+
+            <div style="display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:16px; font-size:0.75em; color:#64748B;">
+                <span><b style="color:#0D9488;">&#9679;</b> 90-100 Excellent</span>
+                <span><b style="color:#2563EB;">&#9679;</b> 85-89.99 Very Good</span>
+                <span><b style="color:#0284C7;">&#9679;</b> 80-84.99 Good</span>
+                <span><b style="color:#D97706;">&#9679;</b> 75-79.99 Passed</span>
+                <span><b style="color:#DC2626;">&#9679;</b> Below 75 Failed</span>
+            </div>
+
+        </div>
+
+        <!--Card 3: Search Existing Record-->
+
+        <div style="background-color:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:24px; margin-bottom:20px; box-shadow:0 10px 25px -12px rgba(15,23,42,0.18);">
+
+            <h3 style="margin:0; color:#1E3A8A;">Search Existing Record</h3>
+            <p style="margin:0 0 16px 0; font-size:0.85em; color:#64748B;">Choose student_records.txt, then enter the Student ID to look for.</p>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;">
+
+                <div>
+                    <span style="display:block; font-weight:600; font-size:0.85em; margin-bottom:4px;">Select student_records.txt</span>
+
+                    <!--The real file input is hidden, the label below works as the styled button-->
+                    <input type="file" id="recordsFile" accept=".txt" onchange="showChosenFile()" style="display:none;">
+
+                    <label for="recordsFile"
+                           onmouseover="this.style.borderColor='#2563EB'" onmouseout="this.style.borderColor='#CBD5E1'"
+                           style="display:flex; align-items:center; gap:10px; box-sizing:border-box; width:100%; padding:9px 12px; border:1px dashed #CBD5E1; border-radius:8px; background-color:#F8FAFC; cursor:pointer; font-size:0.9em; transition:border-color 0.2s;">
+                        <span style="background-color:#1E3A8A; color:white; padding:5px 12px; border-radius:6px; font-weight:600; font-size:0.85em;">Choose File</span>
+                        <span id="chosenFileName" style="color:#64748B; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">No file chosen</span>
+                    </label>
+                </div>
+
+                <div>
+                    <label for="searchId" style="display:block; font-weight:600; font-size:0.85em; margin-bottom:4px;">Student ID to Search</label>
+                    <input type="text" id="searchId" placeholder="e.g. 24-0084C" maxlength="8"
+                           oninput="this.value = this.value.toUpperCase()" onfocus="inputFocus(this)" onblur="inputBlur(this)"
+                           onkeydown="if (event.key === 'Enter') { searchRecord(); }"
+                           style="width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid #CBD5E1; border-radius:8px; font-family:inherit; font-size:0.95em; color:#0F172A; background-color:#FFFFFF; outline:none; transition:border-color 0.2s, box-shadow 0.2s;">
+                </div>
+
+            </div>
+
+            <div style="margin-top:18px;">
+                <input type="button" value="Search Record" onclick="searchRecord()"
+                       onmouseover="buttonHover(this, true)" onmouseout="buttonHover(this, false)"
+                       style="background-color:#1E3A8A; color:white; padding:12px 28px; font-family:inherit; font-size:0.95em; font-weight:600; border:none; border-radius:10px; cursor:pointer; box-shadow:0 6px 14px -6px rgba(30,58,138,0.7); transition:all 0.2s;">
+            </div>
+
+            <!--Search result, filled by JS using innerHTML-->
+            <div id="searchResult" style="margin-top:18px;"></div>
+
+        </div>
+
+        <p style="text-align:center; font-size:0.78em; color:#64748B; margin:0;">All student records are stored in one file only: <b>student_records.txt</b></p>
+
+        <p style="text-align:center; font-size:0.68em; color:#64748B; margin:3px 0 0 0;"><i>Developed by Yuan Miguel V. Mendoza || BSIT 3-AIML</i></p>
+
+    </div>
+
+    <script>
+
+        // ===== GLOBAL VARIABLES =====
+
+        // The 5 grade input boxes, looped through to compute the results
+        var gradeIds = ["grade1", "grade2", "grade3", "grade4", "grade5"];
+
+        // Labels shown on the progress tracker
+        var stepLabels = ["Enter details", "Calculate", "Save record"];
+
+        // The latest successful calculation (this is what gets saved)
+        var lastRecord = null;
+
+        // true only after Calculate succeeded with valid input
+        var resultsReady = false;
+
+        // true after the current record was saved to student_records.txt
+        var isSaved = false;
+
+        // Remembers student_records.txt (File System Access API), also restored after reload
+        var fileHandle = null;
+
+        // ===== REMEMBER student_records.txt AFTER RELOAD (IndexedDB) =====
+
+        function openHandleDB() {
+            return new Promise(function (resolve, reject) {
+                var request = indexedDB.open("studentRecordsDB", 1);
+
+                request.onupgradeneeded = function () {
+                    request.result.createObjectStore("handles");
+                };
+                request.onsuccess = function () {
+                    resolve(request.result);
+                };
+                request.onerror = function () {
+                    reject(request.error);
+                };
+            });
+        }
+
+        async function storeHandle(handle) {
+            try {
+                var db = await openHandleDB();
+
+                await new Promise(function (resolve, reject) {
+                    var tx = db.transaction("handles", "readwrite");
+
+                    if (handle === null) {
+                        tx.objectStore("handles").delete("records");
+                    }
+                    else {
+                        tx.objectStore("handles").put(handle, "records");
+                    }
+
+                    tx.oncomplete = resolve;
+                    tx.onerror = function () {
+                        reject(tx.error);
+                    };
+                });
+            }
+            catch (e) { }
+        }
+
+        async function loadStoredHandle() {
+            try {
+                var db = await openHandleDB();
+
+                return await new Promise(function (resolve) {
+                    var req = db.transaction("handles", "readonly").objectStore("handles").get("records");
+
+                    req.onsuccess = function () {
+                        resolve(req.result || null);
+                    };
+                    req.onerror = function () {
+                        resolve(null);
+                    };
+                });
+            }
+            catch (e) {
+                return null;
+            }
+        }
+
+        // Browser asks the user once per session to allow access again (needs a click)
+        async function ensurePermission(handle, mode) {
+            var options = { mode: mode };
+
+            if ((await handle.queryPermission(options)) === "granted") {
+                return true;
+            }
+
+            return (await handle.requestPermission(options)) === "granted";
+        }
+
+        // ===== SECTIONS AND SUBJECTS (arrays) =====
+
+        // All third-year sections the user can pick from
+        var sectionList = [
+            "BSIT 3-AIML", "BSIT 3-A", "BSIT 3-B",
+            "BSCS 3-A", "BSIS 3-A",
+            "BSCpE 3-A", "BSECE 3-A",
+            "BSA 3-A", "BSBA 3-A"
+        ];
+
+        // 5 subjects per course (the course is the first word of the section)
+        var subjectsByCourse = {
+            "BSIT":  ["Web Systems and Technologies", "Information Assurance and Security", "Systems Integration and Architecture", "Data Science and Analytics", "Capstone Project 1"],
+            "BSCS":  ["Algorithms and Complexity", "Automata and Formal Languages", "Operating Systems", "Software Engineering", "Programming Languages"],
+            "BSIS":  ["Enterprise Architecture", "Business Process Management", "Database Administration", "IS Project Management", "Systems Analysis and Design"],
+            "BSCpE": ["Embedded Systems", "Digital Signal Processing", "Computer Architecture", "Logic Circuits and Design", "Data and Digital Communications"],
+            "BSECE": ["Electronic Circuits", "Communication Systems", "Signals and Spectra", "Electromagnetics", "Microprocessor Systems"],
+            "BSA":   ["Intermediate Accounting", "Cost Accounting and Control", "Income Taxation", "Auditing Theory", "Business Law"],
+            "BSBA":  ["Marketing Management", "Operations Management", "Human Resource Management", "Financial Management", "Business Research"]
+        };
+
+        // Used when no section is selected yet
+        var defaultSubjects = ["Subject 1", "Subject 2", "Subject 3", "Subject 4", "Subject 5"];
+
+        // ===== VALIDATION PATTERNS =====
+
+        // Name: first name + optional middle names or initials + last name (at least 2 words)
+        // Each full name starts with a capital letter followed by small letters (e.g. Juan Dela Cruz)
+        // A middle initial is one capital letter, with or without a period (V or V.)
+        // A hyphenated surname like Reyes-Santos is also allowed. No numbers or other symbols.
+        var namePattern = /^\p{Lu}\p{Ll}+(?:-\p{Lu}\p{Ll}+)?(?: (?:\p{Lu}\p{Ll}+(?:-\p{Lu}\p{Ll}+)?|\p{Lu}\.?))* \p{Lu}\p{Ll}+(?:-\p{Lu}\p{Ll}+)?$/u;
+
+        // Student ID: 2 digits (year), dash, 4 digits (student number), 1 capital letter (college), e.g. 24-0084C
+        var idPattern = /^[0-9]{2}-[0-9]{4}[A-Z]$/;
+
+        // Grade: a plain number such as 92 or 87.5
+        var gradePattern = /^[0-9]+(\.[0-9]+)?$/;
+
+        // ===== HELPER FUNCTIONS =====
+
+        // Prevents user text from being read as HTML when shown with innerHTML
+        function escapeHtml(text) {
+            return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Shows a message in the status banner (type: info, success, warning, error)
+        function setStatus(type, message) {
+            var box = document.getElementById("statusBox");
+            var background = "#EFF6FF";
+            var border = "#BFDBFE";
+            var color = "#1E3A8A";
+            var icon = "&#9432;";
+
+            if (type === "success") {
+                background = "#F0FDFA";
+                border = "#99F6E4";
+                color = "#0F766E";
+                icon = "&#10004;";
+            }
+            else if (type === "warning") {
+                background = "#FFFBEB";
+                border = "#FDE68A";
+                color = "#92400E";
+                icon = "&#9888;";
+            }
+            else if (type === "error") {
+                background = "#FEF2F2";
+                border = "#FECACA";
+                color = "#B91C1C";
+                icon = "&#9888;";
+            }
+
+            box.style.backgroundColor = background;
+            box.style.borderColor = border;
+            box.style.color = color;
+            box.innerHTML = "<b>" + icon + "</b>&nbsp; " + escapeHtml(message);
+        }
+
+        // Shows a message under the Search card
+        function showSearchMessage(type, message) {
+            var background = "#EFF6FF";
+            var border = "#BFDBFE";
+            var color = "#1E3A8A";
+
+            if (type === "error") {
+                background = "#FEF2F2";
+                border = "#FECACA";
+                color = "#B91C1C";
+            }
+            else if (type === "warning") {
+                background = "#FFFBEB";
+                border = "#FDE68A";
+                color = "#92400E";
+            }
+
+            document.getElementById("searchResult").innerHTML =
+                "<div style='padding:12px 14px; border-radius:10px; font-size:0.9em; background-color:" + background + "; border:1px solid " + border + "; color:" + color + ";'><b>" + escapeHtml(message) + "</b></div>";
+        }
+
+        // Highlights a field in red and shows the reason under it
+        function setFieldError(inputId, message) {
+            var input = document.getElementById(inputId);
+            var help = document.getElementById(inputId + "Help");
+
+            input.setAttribute("data-error", "true");
+            input.style.borderColor = "#DC2626";
+            help.textContent = message;
+            help.style.color = "#DC2626";
+        }
+
+        // Removes the red highlight and brings back the normal hint
+        function clearFieldError(inputId) {
+            var input = document.getElementById(inputId);
+            var help = document.getElementById(inputId + "Help");
+
+            input.removeAttribute("data-error");
+            input.style.borderColor = "#CBD5E1";
+            help.textContent = help.getAttribute("data-help");
+            help.style.color = "#64748B";
+        }
+
+        // Blue ring when a field is selected (red if it has an error)
+        function inputFocus(input) {
+            if (input.getAttribute("data-error") === "true") {
+                input.style.borderColor = "#DC2626";
+                input.style.boxShadow = "0 0 0 3px rgba(220,38,38,0.15)";
+            }
+            else {
+                input.style.borderColor = "#2563EB";
+                input.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.18)";
+            }
+        }
+
+        function inputBlur(input) {
+            input.style.boxShadow = "none";
+
+            if (input.getAttribute("data-error") === "true") {
+                input.style.borderColor = "#DC2626";
+            }
+            else {
+                input.style.borderColor = "#CBD5E1";
+            }
+        }
+
+        // Small lift effect on buttons (does nothing while a button is disabled)
+        function buttonHover(button, isOver) {
+            if (button.disabled) {
+                return;
+            }
+
+            if (isOver) {
+                button.style.transform = "translateY(-2px)";
+                button.style.filter = "brightness(1.08)";
+            }
+            else {
+                button.style.transform = "none";
+                button.style.filter = "none";
+            }
+        }
+
+        // Pressing Enter inside a form field runs Calculate
+        function handleEnter(event) {
+            if (event.key === "Enter") {
+                calculateResults();
+            }
+        }
+
+        // Turns the Save Record button on (teal) or off (gray)
+        function setSaveButtonState(isEnabled) {
+            var saveBtn = document.getElementById("saveBtn");
+
+            saveBtn.style.transform = "none";
+            saveBtn.style.filter = "none";
+
+            if (isEnabled) {
+                saveBtn.disabled = false;
+                saveBtn.title = "Save this record to student_records.txt";
+                saveBtn.style.backgroundColor = "#0D9488";
+                saveBtn.style.color = "white";
+                saveBtn.style.cursor = "pointer";
+                saveBtn.style.boxShadow = "0 6px 14px -6px rgba(13,148,136,0.7)";
+            }
+            else {
+                saveBtn.disabled = true;
+                saveBtn.title = "Click Calculate first";
+                saveBtn.style.backgroundColor = "#E2E8F0";
+                saveBtn.style.color = "#94A3B8";
+                saveBtn.style.cursor = "not-allowed";
+                saveBtn.style.boxShadow = "none";
+            }
+        }
+
+        // Checks if every field has something typed in (used only for the progress tracker)
+        function allFieldsFilled() {
+            if (document.getElementById("studentName").value.trim() === "") {
+                return false;
+            }
+            if (document.getElementById("studentId").value.trim() === "") {
+                return false;
+            }
+            if (document.getElementById("studentSection").value === "") {
+                return false;
+            }
+
+            for (var i = 0; i < gradeIds.length; i++) {
+                if (document.getElementById(gradeIds[i]).value.trim() === "") {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Updates the progress tracker and the Save Record button together
+        function updateProgress() {
+            var currentStep = 1;
+
+            if (isSaved) {
+                currentStep = 4;
+            }
+            else if (resultsReady) {
+                currentStep = 3;
+            }
+            else if (allFieldsFilled()) {
+                currentStep = 2;
+            }
+
+            for (var i = 1; i <= 3; i++) {
+                var pill = document.getElementById("step" + i);
+
+                if (i < currentStep) {
+                    // finished step
+                    pill.style.backgroundColor = "#0D9488";
+                    pill.style.color = "white";
+                    pill.textContent = "\u2713 " + stepLabels[i - 1];
+                }
+                else if (i === currentStep) {
+                    // current step
+                    pill.style.backgroundColor = "#F59E0B";
+                    pill.style.color = "#0F172A";
+                    pill.textContent = i + ". " + stepLabels[i - 1];
+                }
+                else {
+                    // upcoming step
+                    pill.style.backgroundColor = "rgba(255,255,255,0.15)";
+                    pill.style.color = "#DBEAFE";
+                    pill.textContent = i + ". " + stepLabels[i - 1];
+                }
+            }
+
+            // Save Record is allowed only after a successful Calculate and only once per calculation
+            setSaveButtonState(resultsReady && !isSaved);
+        }
+
+        // ===== SECTIONS AND SUBJECT LABELS =====
+
+        // Fills the Section drop-down from the sectionList array
+        function fillSections() {
+            var select = document.getElementById("studentSection");
+            select.innerHTML = "<option value=''>-- Select Section --</option>";
+
+            for (var i = 0; i < sectionList.length; i++) {
+                var option = document.createElement("option");
+                option.value = sectionList[i];
+                option.textContent = sectionList[i];
+                select.appendChild(option);
+            }
+        }
+
+        // Changes the 5 subject labels to match the course of the selected section
+        // Long subject names get a smaller font, and every label has the same height so the input boxes stay aligned
+        function updateSubjectLabels() {
+            var section = document.getElementById("studentSection").value;
+            var subjects = defaultSubjects;
+
+            if (section !== "") {
+                var course = section.split(" ")[0];
+
+                if (subjectsByCourse[course] !== undefined) {
+                    subjects = subjectsByCourse[course];
+                }
+            }
+
+            for (var i = 0; i < gradeIds.length; i++) {
+                var label = document.getElementById(gradeIds[i] + "Label");
+                label.textContent = subjects[i];
+
+                // Same height for every label, text sits at the bottom, right above its input box
+                label.style.display = "flex";
+                label.style.alignItems = "flex-end";
+                label.style.minHeight = "34px";
+                label.style.lineHeight = "1.2";
+
+                // The longer the name, the smaller the text
+                if (subjects[i].length > 30) {
+                    label.style.fontSize = "0.68em";
+                }
+                else if (subjects[i].length > 20) {
+                    label.style.fontSize = "0.74em";
+                }
+                else {
+                    label.style.fontSize = "0.8em";
+                }
+            }
+        }
+
+        function sectionChanged(select) {
+            updateSubjectLabels();
+            markInputChanged(select);
+        }
+
+        // ===== INPUT CHANGES =====
+
+        // Runs every time the user types or selects something
+        function markInputChanged(field) {
+            if (field) {
+                // the Student ID is always capital letters (24-0084C)
+                if (field.id === "studentId") {
+                    field.value = field.value.toUpperCase();
+                }
+
+                clearFieldError(field.id);
+            }
+
+            // Old results no longer match the inputs, so Calculate must run again before saving
+            if (resultsReady || isSaved) {
+                resultsReady = false;
+                isSaved = false;
+                lastRecord = null;
+                resetResultCards();
+                setStatus("warning", "Inputs changed. Click Calculate again before saving. Save Record is disabled.");
+            }
+
+            updateProgress();
+        }
+
+        // ===== CALCULATE =====
+
+        // Checks every field. Returns true only when everything is valid.
+        function validateForm() {
+            var isValid = true;
+
+            var name = document.getElementById("studentName").value.trim();
+            var id = document.getElementById("studentId").value.trim().toUpperCase();
+            var section = document.getElementById("studentSection").value;
+
+            // Student Name
+            if (name === "") {
+                setFieldError("studentName", "Student name is required.");
+                isValid = false;
+            }
+            else if (!namePattern.test(name)) {
+                setFieldError("studentName", "Start each name with a capital letter, e.g. Juan Dela Cruz.");
+                isValid = false;
+            }
+            else {
+                clearFieldError("studentName");
+            }
+
+            // Student ID
+            if (id === "") {
+                setFieldError("studentId", "Student ID is required.");
+                isValid = false;
+            }
+            else if (!idPattern.test(id)) {
+                setFieldError("studentId", "Use the format 24-0084C (year-number-college letter).");
+                isValid = false;
+            }
+            else {
+                clearFieldError("studentId");
+            }
+
+            // Section
+            if (section === "") {
+                setFieldError("studentSection", "Please select a section.");
+                isValid = false;
+            }
+            else {
+                clearFieldError("studentSection");
+            }
+
+            // Grades (loop through all 5)
+            for (var i = 0; i < gradeIds.length; i++) {
+                var raw = document.getElementById(gradeIds[i]).value.trim();
+
+                if (raw === "") {
+                    setFieldError(gradeIds[i], "Required. Enter 0 - 100.");
+                    isValid = false;
+                }
+                else if (!gradePattern.test(raw)) {
+                    setFieldError(gradeIds[i], "Numbers only (0 - 100).");
+                    isValid = false;
+                }
+                else if (Number(raw) > 100) {
+                    setFieldError(gradeIds[i], "Maximum grade is 100.");
+                    isValid = false;
+                }
+                else {
+                    clearFieldError(gradeIds[i]);
+                }
+            }
+
+            return isValid;
+        }
+
+        // Conditional statements: the remark that matches the average grade
+        function getRemark(average) {
+            if (average >= 90) {
+                return "EXCELLENT";
+            }
+            else if (average >= 85) {
+                return "VERY GOOD";
+            }
+            else if (average >= 80) {
+                return "GOOD";
+            }
+            else if (average >= 75) {
+                return "PASSED";
+            }
+            else {
+                return "FAILED";
+            }
+        }
+
+        // Color of each remark (matches the grading scale legend)
+        function getRemarkColor(remark) {
+            if (remark === "EXCELLENT") {
+                return "#0D9488";
+            }
+            else if (remark === "VERY GOOD") {
+                return "#2563EB";
+            }
+            else if (remark === "GOOD") {
+                return "#0284C7";
+            }
+            else if (remark === "PASSED") {
+                return "#D97706";
+            }
+            else if (remark === "FAILED") {
+                return "#DC2626";
+            }
+            else {
+                return "#1E3A8A";
+            }
+        }
+
+        // Puts the dashes back in the five result boxes
+        function resetResultCards() {
+            document.getElementById("resultTotal").innerHTML = "&mdash;";
+            document.getElementById("resultAverage").innerHTML = "&mdash;";
+            document.getElementById("resultHighest").innerHTML = "&mdash;";
+            document.getElementById("resultLowest").innerHTML = "&mdash;";
+
+            document.getElementById("resultRemark").innerHTML = "&mdash;";
+            document.getElementById("resultRemark").style.color = "#1E3A8A";
+        }
+
+        function calculateResults() {
+            // Stop here if any field is incomplete or invalid (Save Record stays disabled)
+            if (!validateForm()) {
+                resultsReady = false;
+                isSaved = false;
+                lastRecord = null;
+                resetResultCards();
+                updateProgress();
+                setStatus("error", "Some fields need attention. Fix the highlighted fields, then click Calculate again.");
+                return;
+            }
+
+            // Looping statement: process every grade
+            var grades = [];
+            var total = 0;
+            var highest = 0;
+            var lowest = 0;
+
+            for (var i = 0; i < gradeIds.length; i++) {
+                var grade = Number(document.getElementById(gradeIds[i]).value);
+
+                grades.push(grade);
+                total = total + grade;
+
+                if (i === 0 || grade > highest) {
+                    highest = grade;
+                }
+
+                if (i === 0 || grade < lowest) {
+                    lowest = grade;
+                }
+            }
+
+            // Round to 2 decimal places, the remark uses the same rounded average that is displayed
+            total = Math.round(total * 100) / 100;
+            var average = Math.round((total / gradeIds.length) * 100) / 100;
+            var remark = getRemark(average);
+
+            // Keep the result so Save Record saves exactly what was calculated
+            lastRecord = {
+                name: document.getElementById("studentName").value.trim(),
+                id: document.getElementById("studentId").value.trim().toUpperCase(),
+                section: document.getElementById("studentSection").value,
+                grades: grades,
+                total: total,
+                average: average,
+                highest: highest,
+                lowest: lowest,
+                remark: remark
+            };
+
+            document.getElementById("resultTotal").textContent = total;
+            document.getElementById("resultAverage").textContent = average;
+            document.getElementById("resultHighest").textContent = highest;
+            document.getElementById("resultLowest").textContent = lowest;
+            document.getElementById("resultRemark").textContent = remark;
+            document.getElementById("resultRemark").style.color = getRemarkColor(remark);
+
+            resultsReady = true;
+            isSaved = false;
+            updateProgress();
+            setStatus("success", "Calculation complete. Save Record is now enabled.");
+        }
+
+        // ===== CLEAR =====
+
+        function clearForm() {
+            document.getElementById("studentName").value = "";
+            document.getElementById("studentId").value = "";
+            document.getElementById("studentSection").value = "";
+
+            clearFieldError("studentName");
+            clearFieldError("studentId");
+            clearFieldError("studentSection");
+
+            for (var i = 0; i < gradeIds.length; i++) {
+                document.getElementById(gradeIds[i]).value = "";
+                clearFieldError(gradeIds[i]);
+            }
+
+            lastRecord = null;
+            resultsReady = false;
+            isSaved = false;
+
+            updateSubjectLabels();
+            resetResultCards();
+            updateProgress();
+            setStatus("info", "Form cleared. Save Record is disabled. Click Calculate first.");
+            document.getElementById("studentName").focus();
+        }
+
+        // ===== FILE HANDLING =====
+
+        // Reads a text file with FileReader and returns its text
+        function readFileAsText(file) {
+            return new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+
+                reader.onload = function () {
+                    resolve(reader.result);
+                };
+
+                reader.onerror = function () {
+                    reject(reader.error);
+                };
+
+                reader.readAsText(file);
+            });
+        }
+
+        // One record per line: Name|ID|Section|Grades|Total|Average|Highest|Lowest|Remark
+        function buildRecordLine(record) {
+            return record.name + "|" + record.id + "|" + record.section + "|" + record.grades.join(",") + "|" +
+                record.total + "|" + record.average + "|" + record.highest + "|" + record.lowest + "|" + record.remark;
+        }
+
+        // Lowercase + single spaces, so "juan  DELA cruz" equals "Juan Dela Cruz"
+        function normalizeName(name) {
+            return name.trim().replace(/\s+/g, " ").toLowerCase();
+        }
+
+        // Duplicate rules:
+        //   1. Same Student ID   -> duplicate (the ID is the unique key)
+        //   2. Same name, different ID -> duplicate (one student cannot have two IDs)
+        // Returns a message when a duplicate is found, or "" when the record is new
+        function findDuplicate(fileText, record) {
+            var lines = fileText.split("\n");
+            var newName = normalizeName(record.name);
+
+            for (var i = 0; i < lines.length; i++) {
+                var fields = lines[i].trim().split("|");
+
+                if (fields.length < 2) {
+                    continue;
+                }
+
+                var savedName = normalizeName(fields[0]);
+                var savedId = fields[1].trim().toUpperCase();
+
+                if (savedId === record.id) {
+                    return "Student ID " + record.id + " is already saved under the name " + fields[0] + ". Duplicate IDs are not allowed.";
+                }
+
+                if (savedName === newName) {
+                    return "The name " + fields[0] + " is already saved with Student ID " + savedId + ". The same student cannot be saved twice.";
+                }
+            }
+
+            return "";
+        }
+
+        async function saveRecord() {
+            // Safety check (the button is already disabled, but the code checks too)
+            if (!resultsReady || lastRecord === null || isSaved) {
+                setStatus("error", "Click Calculate first. Save Record is only available after a successful calculation.");
+                return;
+            }
+
+            // Direct saving needs the File System Access API (Google Chrome or Microsoft Edge)
+            if (!window.showSaveFilePicker) {
+                setStatus("error", "This browser cannot save to a file directly. Please open this page in Google Chrome or Microsoft Edge.");
+                return;
+            }
+
+            try {
+                // After a reload: bring back the remembered student_records.txt
+                if (fileHandle === null) {
+                    fileHandle = await loadStoredHandle();
+                }
+
+                // A remembered file needs permission again once per session
+                if (fileHandle !== null && !(await ensurePermission(fileHandle, "readwrite"))) {
+                    setStatus("warning", "Permission to student_records.txt was not allowed. Click Save Record again and choose Allow.");
+                    return;
+                }
+
+                // First time ever: choose student_records.txt (an existing file is kept, never erased)
+                if (fileHandle === null) {
+                    var pickedHandle = await window.showSaveFilePicker({
+                        suggestedName: "student_records.txt",
+                        types: [{ description: "Text Files", accept: { "text/plain": [".txt"] } }]
+                    });
+
+                    if (pickedHandle.name.toLowerCase() !== "student_records.txt") {
+                        setStatus("error", "Please choose the file named student_records.txt (you picked " + pickedHandle.name + ").");
+                        return;
+                    }
+
+                    fileHandle = pickedHandle;
+                    await storeHandle(fileHandle);
+                }
+
+                // Read the old records first, so the new one is added after them
+                var existingText = await readFileAsText(await fileHandle.getFile());
+
+                // Duplicate check (ID or name)
+                var duplicateMessage = findDuplicate(existingText, lastRecord);
+
+                if (duplicateMessage !== "") {
+                    setStatus("warning", duplicateMessage);
+                    return;
+                }
+
+                if (existingText !== "" && existingText.slice(-1) !== "\n") {
+                    existingText = existingText + "\n";
+                }
+
+                // Write the old records + the new one back into the SAME file
+                var writable = await fileHandle.createWritable();
+                await writable.write(existingText + buildRecordLine(lastRecord) + "\n");
+                await writable.close();
+
+                isSaved = true;
+                updateProgress();
+                setStatus("success", "Record saved to student_records.txt. Click Clear to enter another student.");
+            }
+            catch (error) {
+                // AbortError means the user simply closed the file dialog
+                if (error.name === "AbortError") {
+                    setStatus("info", "Saving was cancelled. The record was not saved yet.");
+                }
+                else {
+                    setStatus("error", "Unable to save to student_records.txt: " + error.message);
+                }
+            }
+        }
+
+        // ===== SEARCH =====
+
+        // Shows the name of the chosen file
+        function showChosenFile() {
+            var fileInput = document.getElementById("recordsFile");
+            var label = document.getElementById("chosenFileName");
+
+            if (fileInput.files.length > 0) {
+                label.textContent = fileInput.files[0].name;
+                label.style.color = "#0F172A";
+            }
+            else {
+                label.textContent = "No file chosen";
+                label.style.color = "#64748B";
+            }
+        }
+
+        async function searchRecord() {
+            var searchId = document.getElementById("searchId").value.trim().toUpperCase();
+            var fileInput = document.getElementById("recordsFile");
+            var fileToRead = null;
+
+            // Validation: block an empty or wrongly formatted Student ID
+            if (searchId === "") {
+                showSearchMessage("error", "Please enter the Student ID to search for.");
+                return;
+            }
+
+            if (!idPattern.test(searchId)) {
+                showSearchMessage("error", "Student ID must follow the format 24-0084C (year-number-college letter).");
+                return;
+            }
+
+            // Use the chosen file, or the remembered student_records.txt
+            if (fileInput.files.length > 0) {
+                fileToRead = fileInput.files[0];
+            }
+            else {
+                try {
+                    if (fileHandle === null) {
+                        fileHandle = await loadStoredHandle();
+                    }
+
+                    if (fileHandle !== null && await ensurePermission(fileHandle, "read")) {
+                        fileToRead = await fileHandle.getFile();
+                    }
+                }
+                catch (error) {
+                    fileToRead = null;
+                }
+            }
+
+            if (fileToRead === null) {
+                showSearchMessage("error", "Please choose student_records.txt first.");
+                return;
+            }
+
+            var fileText = "";
+
+            try {
+                fileText = await readFileAsText(fileToRead);
+            }
+            catch (error) {
+                showSearchMessage("error", "Unable to read the file. Please choose student_records.txt again.");
+                return;
+            }
+
+            // Loop through every line and compare the Student ID
+            var lines = fileText.split("\n");
+            var foundFields = null;
+
+            for (var i = 0; i < lines.length; i++) {
+                var fields = lines[i].trim().split("|");
+
+                // A valid record has 9 fields: Name|ID|Section|Grades|Total|Average|Highest|Lowest|Remark
+                if (fields.length === 9 && fields[1].toUpperCase() === searchId) {
+                    foundFields = fields;
+                    break;
+                }
+            }
+
+            if (foundFields === null) {
+                showSearchMessage("warning", "Record not found.");
+                return;
+            }
+
+            // Show only: Student Name, Student ID, Section, Average Grade, Remark
+            var remark = foundFields[8];
+
+            document.getElementById("searchResult").innerHTML =
+                "<div style='background-color:#F8FAFC; border:1px solid #E2E8F0; border-left:5px solid " + getRemarkColor(remark) + "; border-radius:12px; padding:18px 20px;'>" +
+                "<p style='margin:0 0 10px 0; font-size:0.75em; color:#64748B; text-transform:uppercase; letter-spacing:1px;'>Record found</p>" +
+                "<p style='margin:4px 0;'><b>Student Name:</b> " + escapeHtml(foundFields[0]) + "</p>" +
+                "<p style='margin:4px 0;'><b>Student ID:</b> " + escapeHtml(foundFields[1]) + "</p>" +
+                "<p style='margin:4px 0;'><b>Section:</b> " + escapeHtml(foundFields[2]) + "</p>" +
+                "<p style='margin:4px 0;'><b>Average Grade:</b> " + escapeHtml(foundFields[5]) + "</p>" +
+                "<p style='margin:4px 0;'><b>Remark:</b> <span style='color:" + getRemarkColor(remark) + "; font-weight:700;'>" + escapeHtml(remark) + "</span></p>" +
+                "</div>";
+        }
+
+        // ===== START =====
+
+        // Runs when the page is first opened: Save Record starts disabled
+        fillSections();
+        updateSubjectLabels();
+        resetResultCards();
+        updateProgress();
+        setStatus("info", "Save Record is disabled. Click Calculate first.");
+
+        // After a reload: reconnect to the remembered student_records.txt (can never break the form)
+        try {
+            loadStoredHandle().then(function (handle) {
+                if (handle !== null) {
+                    fileHandle = handle;
+                    document.getElementById("chosenFileName").textContent = handle.name + " (remembered)";
+                    document.getElementById("chosenFileName").style.color = "#0F172A";
+                }
+            }).catch(function () { });
+        }
+        catch (e) { }
+
+    </script>
+
+</body>
+</html>
